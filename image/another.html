@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tom and Jerry Game</title>
+    <style>
+        body {
+            text-align: center;
+            background-color: lightblue;
+            animation-play-state: running;
+            position:relative;
+        }
+        #gameArea {
+            width: 600px;
+            height: 400px;
+            border: 2px solid black;
+            position: relative;
+            margin: auto;
+            overflow: hidden;
+            background: url('background.jpg') no-repeat center/cover;
+        }
+        .character {
+            width: 50px;
+            height: 50px;
+            position: absolute;
+        }
+        #tom {
+            bottom: 10px;
+            left: 10px;
+        }
+        #jerry {
+            top: 50px;
+            left: 500px;
+        }
+        #scoreboard {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tom and Jerry Game</h1>
+    <div id="scoreboard">Score: 0 | Time Left: <span id="time">30</span>s</div>
+    <div id="gameArea">
+        <img src="https://cdn.pixabay.com/photo/2020/05/11/15/38/tom-5158824_1280.png" id="tom" class="character">
+        <img src="https://upload.wikimedia.org/wikipedia/en/2/2f/Jerry_Mouse.png" id="jerry" class="character">
+    </div>
+    <script>
+        let tom = document.getElementById("tom");
+        let jerry = document.getElementById("jerry");
+        let scoreBoard = document.getElementById("scoreboard");
+        let timeDisplay = document.getElementById("time");
+        let tomSpeed = 10;
+        let score = 0;
+        let timeLeft = 30;
+        let gameInterval;
+
+        // Move Tom with Arrow Keys
+        document.addEventListener("keydown", function(event) {
+            let tomLeft = tom.offsetLeft;
+            let tomTop = tom.offsetTop;
+            if (event.key === "ArrowRight" && tomLeft + tomSpeed < 550) {
+                tom.style.left = tomLeft + tomSpeed + "px";
+            }
+            if (event.key === "ArrowLeft" && tomLeft - tomSpeed > 0) {
+                tom.style.left = tomLeft - tomSpeed + "px";
+            }
+            if (event.key === "ArrowUp" && tomTop - tomSpeed > 0) {
+                tom.style.top = tomTop - tomSpeed + "px";
+            }
+            if (event.key === "ArrowDown" && tomTop + tomSpeed < 350) {
+                tom.style.top = tomTop + tomSpeed + "px";
+            }
+            checkCollision();
+        });
+
+        // Move Jerry Randomly
+        function moveJerry() {
+            let newX = Math.floor(Math.random() * 550);
+            let newY = Math.floor(Math.random() * 350);
+            jerry.style.left = newX + "px";
+            jerry.style.top = newY + "px";
+        }
+
+        // Check Collision
+        function checkCollision() {
+            let tomRect = tom.getBoundingClientRect();
+            let jerryRect = jerry.getBoundingClientRect();
+            if (tomRect.right > jerryRect.left &&
+                tomRect.left < jerryRect.right &&
+                tomRect.bottom > jerryRect.top &&
+                tomRect.top < jerryRect.bottom) {
+                score++;
+                scoreBoard.innerHTML = Score: ${score} | Time Left: <span id="time">${timeLeft}</span>s;
+                moveJerry();
+            }
+        }
+
+        // Timer
+        function startGame() {
+            gameInterval = setInterval(() => {
+                timeLeft--;
+                timeDisplay.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(gameInterval);
+                    alert(Game Over! Your Score: ${score});
+                    resetGame();
+                }
+            }, 1000);
+        }
+
+        function resetGame() {
+            tom.style.left = "10px";
+            tom.style.top = "350px";
+            score = 0;
+            timeLeft = 30;
+            scoreBoard.innerHTML = Score: 0 | Time Left: <span id="time">${timeLeft}</span>s;
+            startGame();
+        }
+
+        startGame();
+        setInterval(moveJerry, 1000);
+    </script>
+</body>
+</html>
